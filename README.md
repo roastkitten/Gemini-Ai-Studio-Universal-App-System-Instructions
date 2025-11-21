@@ -1,40 +1,39 @@
-# Universal Web App System Instructions for Google Gemini
+# Universal Web App Coding Guidelines
 
-This repository contains a specialized system prompt (`system_prompt.md`) designed for use with Google Gemini AI Studio. 
+This repository contains specialized system instructions designed for use with AI coding assistants.
 
 ## Purpose
+The goal of these instructions is to enable the generation of "Universal Vanilla Web Applications." These applications are architected to function correctly in two distinct environments without requiring code modification or build steps:
 
-The goal of these instructions is to enable Google Gemini to generate "Universal" or "Hybrid" vanilla web applications. These applications are unique because they function correctly in two distinct environments without requiring code modification or build steps:
-
-1.  **Google AI Studio / Vite:** The generated code satisfies the bundler requirements of the AI Studio preview environment (using a bridge `index.tsx`).
-2.  **Local File System:** The same code can be downloaded, and `index.html` can be opened directly in a browser via the `file://` protocol. 
-
-## How It Works
-
-Standard bundlers (like Vite) and local file execution often conflict. Bundlers want ES Modules and entry points; local execution via `file://` blocks ES Modules due to CORS policies.
-
-This system prompt instructs the AI to follow a **"Hybrid Injection Strategy"**:
-*   It generates a `main.js` that avoids ES modules and uses self-executing functions (IIFE).
-*   It includes a "self-healing" mechanism that injects the HTML structure if the bundler ignores the HTML body.
-*   It uses a dummy `index.tsx` solely to import the CSS and JS for the bundler environment.
-
-## Limitations vs. Standard Vite Apps
-
-By prioritizing strict compatibility with the local file system (`file://`), these applications face specific constraints compared to standard Vite/TypeScript environments found in AI Studio:
-
-*   **No ES Modules:** You cannot use `import` and `export` keywords to organize code across multiple files. All logic must reside within the single `main.js` file or share state via global variables.
-*   **No NPM Imports:** You cannot import libraries from `node_modules`. 
-*   **No TypeScript:** The logic must be written in plain JavaScript. Browsers cannot execute TypeScript directly without a build step.
-*   **No Environment Variables:** You cannot rely on `.env` files or `process.env`. API keys must be input by the user via the UI.
-*   **Strict CORS Rules:** The `file://` protocol is treated as a `null` origin. This prevents `fetch()` requests to local files and may block some external API calls.
-
-## External Libraries & Frameworks
-
-**Can I use frameworks?**
-*   **Build-step Frameworks (NO):** You **cannot** use React (JSX), Vue (.vue files), Svelte, or Angular. These require a compilation step that does not exist when opening a file locally.
-*   **Runtime Libraries (YES):** You **can** use "regular" JavaScript libraries and lightweight frameworks that function via a CDN script tag (UMD/Global build).
-    *   *Examples:* Alpine.js, jQuery, p5.js, D3.js, Three.js, TailwindCSS (via CDN script).
+1. Bundled Environments: Google AI Studio, Vite, or Replit. The code utilizes a bridge entry point (index.tsx) to satisfy bundlers.
+2. Local File System: The same code can be downloaded, and index.html can be opened directly in a browser via the file:// protocol.
 
 ## Usage
+Copy the contents of the System Instructions into Ai Studio System Instructions configuration (https://aistudio.google.com/apps) to generate modular, portable web apps.
 
-Copy the contents of `system_prompt.md` into the "System Instructions" field in Google AI Studio to start generating standalone, portable web apps.
+## How It Works
+Standard bundlers and local file execution have conflicting requirements. Bundlers typically rely on ES Modules; however, local execution via the file:// protocol blocks ES Modules due to Cross-Origin Resource Sharing (CORS) restrictions.
+
+This system prompt instructs the AI to follow a "JS-Driven Namespace Strategy" to bypass these local limitations:
+
+*   Namespace Architecture: All JavaScript code attaches to a global window.App object rather than using module exports.
+*   Self-Executing Functions: Files use IIFEs to encapsulate logic and avoid global scope pollution, ensuring compatibility with strict file:// restrictions.
+*   Bridge File: A dummy index.tsx file imports all JavaScript files in dependency order to trigger the bundler.
+*   Template Injection: HTML structure is stored within JavaScript strings (e.g., in a UI namespace) rather than the HTML body, ensuring consistent rendering across both environments.
+
+## Limitations vs. Standard Vite Apps
+By prioritizing strict compatibility with the local file system, these applications face specific constraints compared to standard TypeScript environments:
+
+*   No ES Modules: You cannot use import or export keywords in JavaScript files. Browsers block ES module loading on the file:// protocol due to CORS policies.
+*   Strict CORS Rules: The file:// protocol is treated as a null origin. This prevents fetch() requests to local files and blocks module loading.
+*   No Node Imports: You cannot import libraries from node_modules.
+*   No TypeScript Logic: Logic must be written in plain JavaScript. Type safety is handled via JSDoc comments.
+*   Manual Dependency Management: Because there are no imports, files must be loaded in a strict order (e.g., Utils before Logic, Logic before UI).
+
+## External Libraries & Frameworks
+Can I use frameworks?
+
+*   Build-step Frameworks (NO): You cannot use React, Vue, Svelte, or Angular. These require compilation steps incompatible with local file execution.
+*   Runtime Libraries (YES): You can use JavaScript libraries that function via a CDN script tag.
+
+```
