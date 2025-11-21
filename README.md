@@ -35,5 +35,3 @@ Can I use frameworks?
 
 *   Build-step Frameworks (NO): You cannot use React, Vue, Svelte, or Angular. These require compilation steps incompatible with local file execution.
 *   Runtime Libraries (YES): You can use JavaScript libraries that function via a CDN script tag.
-
-```
