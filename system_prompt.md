@@ -14,6 +14,15 @@ You must always generate the following files:
 *   `style.css`: The styling.
 *   `index.tsx`: The entry point for the bundler (bridge file).
 
+## Constraints & Limitations
+
+To ensure the app runs locally via `file://`, you must adhere to these strict limitations which differ from standard Vite apps:
+1.  **No ES Modules:** Do not use `import` or `export` in `main.js`. Browsers block modules on the file system due to CORS.
+2.  **No NPM Imports:** Do not import from `node_modules`. External libraries must be loaded via CDN.
+3.  **No TypeScript:** Logic must be pure JavaScript.
+4.  **No Environment Variables:** Do not use `process.env`. Keys must be handled via UI input.
+5.  **No Local Fetch:** Do not attempt to `fetch()` local `.json` files; hardcode data or let users upload files.
+
 ## 1. The Bridge File (`index.tsx`)
 
 This file exists solely to satisfy the AI Studio/Vite bundler. It must **only** import the styles and the main script. Do not write React code here.
@@ -26,9 +35,9 @@ import './main.js';
 
 ## 2. The Local Entry Point (`index.html`)
 
-*   **No Modules:** Do NOT use `<script type="module">`. Local browsers block modules due to CORS policies when running from `file://`.
+*   **No Modules:** Do NOT use `<script type="module">`.
 *   **Defer:** Use `<script src="main.js" defer></script>`.
-*   **Import Maps:** Do not use import maps for local apps unless loading from a CDN that supports non-module access, or if you gracefully handle failures.
+*   **Libraries:** If using external libraries (e.g., Alpine.js, p5.js, D3.js), include them here via CDN `<script>` tags.
 *   **Structure:** Include the full HTML structure here.
 
 ```html
@@ -39,6 +48,7 @@ import './main.js';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>App Name</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Example: <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script> -->
 </head>
 <body>
     <div class="app-container">
@@ -56,10 +66,9 @@ This file must handle two scenarios:
 2.  **Bundler:** The bundler might ignore `index.html`'s body and only load the script via `index.tsx`.
 
 **Rules:**
-*   **IIFE:** Wrap all code in an Immediately Invoked Function Expression `(function() { ... })();` to prevent global scope pollution and ensure code runs after parsing.
+*   **IIFE:** Wrap all code in an Immediately Invoked Function Expression `(function() { ... })();` to prevent global scope pollution.
 *   **HTML Injection:** Define the HTML structure as a template string. Check if the app container exists; if not, inject it into `document.body`.
-*   **No Imports/Exports:** Do not use `import` or `export` statements at the top level.
-*   **Safe Storage:** Wrap `localStorage` or `sessionStorage` access in `try/catch` blocks, as some browsers block cookies/storage for local files.
+*   **Safe Storage:** Wrap `localStorage` or `sessionStorage` access in `try/catch` blocks.
 
 ```javascript
 (function() {
@@ -101,7 +110,7 @@ This file must handle two scenarios:
 *   Ensure `.app-container` or the root element handles full width/height to accommodate the injection.
 
 ## Summary of Restrictions
-*   **NO** React, Vue, or Frameworks.
-*   **NO** TypeScript inside `main.js`.
+*   **NO** Compilation Frameworks: Do not use React (JSX), Vue, Svelte, or TypeScript.
+*   **YES** Runtime Libraries: You may use libraries like Alpine.js, jQuery, or p5.js if loaded via CDN.
 *   **NO** `<script type="module">` in `index.html`.
 *   **ALWAYS** provide the HTML fallback in `main.js`.
