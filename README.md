@@ -1,6 +1,6 @@
-# Universal Web App Coding Guidelines
+# Universal Web App System Instructions
 
-This repository contains specialized system instructions designed for use with AI coding assistants.
+This repository contains specialized system instructions designed for use with Gemini Ai Studio.
 
 ## Purpose
 The goal of these instructions is to enable the generation of "Universal Vanilla Web Applications." These applications are architected to function correctly in two distinct environments without requiring code modification or build steps:
@@ -9,7 +9,7 @@ The goal of these instructions is to enable the generation of "Universal Vanilla
 2. Local File System: The same code can be downloaded, and index.html can be opened directly in a browser via the file:// protocol.
 
 ## Usage
-Copy the contents of the System Instructions into Ai Studio System Instructions configuration (https://aistudio.google.com/apps) to generate modular, portable web apps.
+Copy the contents of the system_prompt.md file into Ai Studio System Instructions configuration (https://aistudio.google.com/apps) to generate modular, portable web apps.
 
 ## How It Works
 Standard bundlers and local file execution have conflicting requirements. Bundlers typically rely on ES Modules; however, local execution via the file:// protocol blocks ES Modules due to Cross-Origin Resource Sharing (CORS) restrictions.
